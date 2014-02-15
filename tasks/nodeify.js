@@ -20,7 +20,7 @@ module.exports = function(grunt) {
     // Please see the Grunt documentation for more information regarding task
     // creation: http://gruntjs.com/creating-tasks
 
-    var EOL = os.EOL, TAB = '\t';
+    var EOL = os.EOL, TAB = '    ';
 
     grunt.registerMultiTask('nodeify', 'Convert js files to node modules', function() {
         // Merge task-specific and/or target-specific options with these defaults.
@@ -68,7 +68,7 @@ module.exports = function(grunt) {
     function writeRequires(requires, lastFile){
         var props = [];
         for(var i = 0; i < requires.length; i++){
-            props.push('var ' + requires[i] + ' = require("' + lastFile + '")');
+            props.push('var ' + requires[i] + ' = require("' + lastFile + '").' + requires[i]);
         }
         return props.join(';'+EOL) + ';' + EOL + EOL;
     }
@@ -90,6 +90,6 @@ module.exports = function(grunt) {
         }
 
         var strProps = props.join(',');
-        return 'module.export = {'  + strProps + EOL + '}' + EOL;
+        return 'module.exports = {'  + strProps + EOL + '};' + EOL;
     }
 };
