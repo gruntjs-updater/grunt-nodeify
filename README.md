@@ -1,7 +1,10 @@
-grunt-nodeify
+
 # grunt-nodeify
 
-> Convert js files to node modules
+> Convert js files to node modules by executing the code in the files and linking each function/objects created in the global scope. 
+
+/!\ Caution with the js files you pass to the task, I use vm.runInContext(code, context, [filename]) and it effectively executes the js code. I don't know how it is sandboxed,  it might run dangerous code.  
+/!\ It is a fast coding draft
 
 ## Getting Started
 This plugin requires Grunt `~0.4.2`
@@ -25,66 +28,53 @@ In your project's Gruntfile, add a section named `nodeify` to the data object pa
 
 ```js
 grunt.initConfig({
-  nodeify: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
-  },
+   nodeify: {
+         target:{
+             files:[{
+                 src: ['_xt.js', 'modules/_xt.events.js'],
+                 dest: 'node/'
+             }]
+         }
+     }
 });
 ```
-
-### Options
-
-#### options.separator
-Type: `String`
-Default value: `',  '`
-
-A string value that is used to do something with whatever.
-
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
-
-A string value that is used to do something else with whatever else.
 
 ### Usage Examples
 
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+In this example, nodeify will convert _xt.js and _xt.events.js by adding module.export and requires node instructions
 
 ```js
 grunt.initConfig({
-  nodeify: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
+   nodeify: {
+         _xt:{
+             files:[{
+                 src: ['_xt.js', 'modules/_xt.events.js'],
+                 dest: 'node/'
+             }]
+         }
+     }
 });
 ```
+  
+  As _xt,js only creates a single object called '_xt', the generation add only one property to the export object.  
+  At the end of node/_xt.js you'll find:
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
-
-```js
-grunt.initConfig({
-  nodeify: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
+``` js
+module.export = {
+    _xt: _xt
+}
 ```
 
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
-
-## Release History
-_(Nothing yet)_
+  At the beginning of node/_xt.event.js you'll find:
+``` js
+var _xt = require("./_xt.js");
+```
+  _xt.events will also export _xt as _xt remains in the global scope but also each new global object created.
+``` js
+module.export = {
+    _xt: _xt
+}
+```
+  
+  Each file of a target is linked with the others depending the order. If you don't want a file to export something, create a second target.
