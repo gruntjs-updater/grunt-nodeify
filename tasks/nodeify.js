@@ -57,8 +57,8 @@ module.exports = function(grunt) {
                 fileContent = fileContent + writeExport(context, requires);
 
                 var s = path.basename(filepath, '.js');
-                lastFile = f.dest + s + '.node.js';
-                grunt.file.write(lastFile, fileContent);
+                lastFile = './' + s + '.js';
+                grunt.file.write(path.join(f.dest, lastFile), fileContent);
 
 
             });
@@ -68,9 +68,9 @@ module.exports = function(grunt) {
     function writeRequires(requires, lastFile){
         var props = [];
         for(var i = 0; i < requires.length; i++){
-            props.push('var ' + requires[i] + ' = requires("' + lastFile + '")');
+            props.push('var ' + requires[i] + ' = require("' + lastFile + '")');
         }
-        return props.join(';'+EOL) + ';';
+        return props.join(';'+EOL) + ';' + EOL + EOL;
     }
     function writeExport(context, requires){
         var props = [];
