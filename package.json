@@ -1,7 +1,7 @@
 {
   "name": "grunt-nodeify",
   "description": "Convert js files to node modules",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/KNedelec/grunt-nodeify",
   "author": {
     "name": "Kevin Nedelec",
