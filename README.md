@@ -28,53 +28,95 @@ In your project's Gruntfile, add a section named `nodeify` to the data object pa
 
 ```js
 grunt.initConfig({
-   nodeify: {
-         target:{
-             files:[{
-                 src: ['_xt.js', 'modules/_xt.events.js'],
-                 dest: 'node/'
-             }]
-         }
-     }
+    nodeify:{
+        ex:{
+            files:[{
+                src: ['fixtures/ex1.js', 'fixtures/ex2.js'],
+                dest: 'node/'
+            }]
+        }
+    }
 });
 ```
 
 ### Usage Examples
 
-#### Default Options
-In this example, nodeify will convert _xt.js and _xt.events.js by adding module.export and requires node instructions
+
+In this example (see unit test), nodeify will convert ex1.js and ex2.js by adding module.export and requires node instructions  
+  
+fixtures/ex1.js
 
 ```js
-grunt.initConfig({
-   nodeify: {
-         _xt:{
-             files:[{
-                 src: ['_xt.js', 'modules/_xt.events.js'],
-                 dest: 'node/'
-             }]
-         }
-     }
-});
+var ex1 = {
+    p : function(){
+        return 'p';
+    }
+};
+
+var ex11 = function(){
+    return 'ex11';
+};
+```
+fixtures/ex2.js
+
+```js
+var ex2 = {
+    func: function(){
+        return 'func';
+    },
+
+    p: function(){
+        return ex1.p();
+    }
+};
+
+var ex21 = 'ex21' + ex11();
 ```
   
-  As _xt,js only creates a single object called '_xt', the generation add only one property to the export object.  
-  At the end of node/_xt.js you'll find:
+   
+After nodeify:
+  
+node/ex1.js
 
-``` js
-module.export = {
-    _xt: _xt
-}
-```
+```js
+var ex1 = {
+    p : function(){
+        return 'p';
+    }
+};
 
-  At the beginning of node/_xt.event.js you'll find:
-``` js
-var _xt = require("./_xt.js");
+var ex11 = function(){
+    return 'ex11';
+};
+module.exports = {
+    ex11: ex11,
+    ex1: ex1
+};
 ```
-  _xt.events will also export _xt as _xt remains in the global scope but also each new global object created.
-``` js
-module.export = {
-    _xt: _xt
-}
+node/ex2.js
+
+```js
+var ex11 = require("./ex1.js").ex11;
+var ex1 = require("./ex1.js").ex1;
+
+var ex2 = {
+    func: function(){
+        return 'func';
+    },
+
+    p: function(){
+        return ex1.p();
+    }
+};
+
+var ex21 = 'ex21' + ex11();
+module.exports = {
+    ex2: ex2,
+    ex11: ex11,
+    ex1: ex1,
+    ex21: ex21
+};
 ```
   
-  Each file of a target is linked with the others depending the order. If you don't want a file to export something, create a second target.
+  
+  Each file of a target is linked with the others depending the order. If you don't want a file to export something, create a second target. Every object in the global scope is exported..
