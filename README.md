@@ -3,8 +3,6 @@
 
 > Convert js files to node modules by executing the code in the files and linking each function/objects created in the global scope. 
 
-/!\ Caution with the js files you pass to the task, I use vm.runInContext(code, context, [filename]) and it effectively executes the js code. I don't know how it is sandboxed,  it might run dangerous code.  
-/!\ It is a fast coding draft
 
 ## Getting Started
 This plugin requires Grunt `~0.4.2`
